@@ -24,7 +24,7 @@ public class UserController {
 
     @GetMapping("/form")
     public String form() {
-        return "/user/form"; //form.html of mustache
+        return "user/form"; //form.html of mustache
     }
 
     @GetMapping("/{id}/form")
@@ -56,6 +56,6 @@ public class UserController {
     @GetMapping("/list")
     public String list(Model model) {
         model.addAttribute("users", userRepository.findAll());
-        return "/user/list"; //list.html of mustache
+        return "user/list"; //list.html of mustache
     }
 }
