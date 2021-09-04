@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,28 @@ public class UserController {
     @Autowired // UserRepository가 어디에 생성되어 있다고 생각하고 가져다 쓰는 개념
     private UserRepository userRepository;
 
+    @GetMapping("/loginForm")
+    public String loginForm() {
+        return "user/login";
+    }
+
+    @PostMapping("/login")
+    public String login(String userId, String password, HttpSession httpSession) {
+
+        User user = userRepository.findByUserId(userId);
+
+        if(user==null || !password.equals(user.getPassword())) {
+            System.out.println("Login failed!!");
+            return "redirect:/users/loginForm";
+        }
+
+        // 세션에 로그인 사용자 정보 저장
+        httpSession.setAttribute("user", user);
+        System.out.println("로그인 한 사용자 :" + user.getUserId());
+
+        return "redirect:/";
+    }
+
     @GetMapping("/form")
     public String form() {
         return "user/form"; //form.html of mustache
@@ -32,7 +55,7 @@ public class UserController {
         User user = userRepository.findById(id).get();
         System.out.println(user);
         model.addAttribute("user", user);
-        return "/user/updateForm"; //updateForm.html of mustache
+        return "user/updateForm"; //updateForm.html of mustache
     }
 
     @PostMapping("/update")
