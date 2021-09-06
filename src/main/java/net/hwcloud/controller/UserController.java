@@ -45,6 +45,15 @@ public class UserController {
         return "redirect:/";
     }
 
+    @GetMapping("/logout")
+    public String logout(HttpSession httpSession) {
+
+        // 세션 정보 제거
+        System.out.println(httpSession.getAttribute("user") + " : 로그아웃한 사용자");
+        httpSession.removeAttribute("user");
+        return "redirect:/";
+    }
+
     @GetMapping("/form")
     public String form() {
         return "user/form"; //form.html of mustache
