@@ -9,7 +9,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동으로 Increment
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length=20, unique = true)
     private String userId;
 
     private String password;
