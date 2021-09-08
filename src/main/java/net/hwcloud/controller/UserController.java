@@ -2,6 +2,7 @@ package net.hwcloud.controller;
 
 import net.hwcloud.dto.User;
 import net.hwcloud.dto.UserRepository;
+import net.hwcloud.utils.HttpSessionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,15 +26,16 @@ public class UserController {
 
     @GetMapping("/loginForm")
     public String loginForm() {
-        return "user/login";
+        return "user/login"; // login.html
     }
 
     @PostMapping("/login")
     public String login(String userId, String password, HttpSession httpSession) {
 
         User user = userRepository.findByUserId(userId);
-
-        if(user==null || !password.equals(user.getPassword())) {
+        
+        // 객체 지향에서 user와 같은 객체에서 값을 긁어오지 말고 일을 시켜라.
+        if(user==null || !user.comparePassword(password)) {
             System.out.println("Login failed!!");
             return "redirect:/users/loginForm";
         }
@@ -62,13 +64,16 @@ public class UserController {
     @GetMapping("/{id}/form")
     public String updateForm(@PathVariable Long id, Model model, HttpSession httpSession) {
 
+        User sessionUser = HttpSessionUtils.getUserfromSession(httpSession);
         // 사용자가 로그인 했는지 우선 확인
-        User sessionUser = (User)httpSession.getAttribute("sessionUser");
-        if(sessionUser == null) {
+        // 로그인 한 사용자가 아닌 경우
+        if(!HttpSessionUtils.isLoginUser(httpSession)) {
             return "user/login"; // 로그인 페이지로 안내
         }
+        // 로그인 한 사용자가 수정하려는 사용자의 ID와 일치하지 않는 경우
         else {
-            if(!id.equals(sessionUser.getId())) {
+            // getId 대신 비교 method를 생성
+            if(!sessionUser.compareId(id)) {
                 throw new IllegalStateException("자신의 정보만 수정할 수 있습니다.");
             }
         }
@@ -85,8 +90,8 @@ public class UserController {
         System.out.println(userRepository.findById(newUser.getId()).get());
 
         // 사용자가 로그인 했는지 우선 확인
-        User sessionUser = (User)httpSession.getAttribute("sessionUser");
-        if(sessionUser == null) {
+        // 로그인 한 사용자가 아닌 경우
+        if(!HttpSessionUtils.isLoginUser(httpSession)) {
             return "user/login"; // 로그인 페이지로 안내
         }
 
