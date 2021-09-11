@@ -9,6 +9,9 @@ group = 'net.hwcloud'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 apply plugin:'war'
+bootWar.enabled = false;
+war.enabled = true
+
 
 repositories {
 	mavenCentral()
